@@ -134,7 +134,17 @@ def _build_styles(theme_hex):
             spaceAfter=18,  # mai mult spațiu sub titlu
         )
     )
-
+    styles.add(
+        ParagraphStyle(
+            name="CenterTitle",
+            fontName="Helvetica-Bold",
+            fontSize=14,
+            alignment=TA_CENTER,
+            textColor=accent,
+            spaceBefore=12,
+            spaceAfter=12,  # mai mult spațiu sub titlu
+        )
+    )
     styles.add(
         ParagraphStyle(
             name="SubHeading",
