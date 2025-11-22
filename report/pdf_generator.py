@@ -664,7 +664,7 @@ def generate_pdf_bytes(report: dict) -> bytes:
     ]
 
     # ---------- 2.x Finding Severity Ratings ----------
-    toc_entries.append(("2.0", "Finding Severity Ratings"))
+    toc_entries.append(("1.4", "Finding Severity Ratings"))
 
     # ---------- 3.x Executive Summary ----------
     toc_entries.append(("3.0", "Executive Summary"))
@@ -744,6 +744,7 @@ def generate_pdf_bytes(report: dict) -> bytes:
     sec11(elements, styles, report)
     sec12(elements, styles, report)
     sec13(elements, styles, report)
+    sec30(elements, styles, report)
     elements.append(PageBreak())
 
     # ==========================================================
@@ -756,7 +757,7 @@ def generate_pdf_bytes(report: dict) -> bytes:
     # ==========================================================
     # PAGINA 5: 2.x + 3.0
     # ==========================================================
-    sec30(elements, styles, report)
+
     sec20(elements, styles, report)
     sec21(elements, styles, report)
     sec22(elements, styles, report)
