@@ -340,8 +340,10 @@ def generate_pdf_bytes(report: dict, watermark=None, theme_hex: str = "#2E3B4E")
         topMargin=20 * mm,
         bottomMargin=20 * mm
     )
-
-    styles = _get_styles()
+    theme_hex = report.get("theme_hex", "#2E3B4E")
+    accent = _hex_to_color(theme_hex)
+    watermark_enabled = bool(report.get("watermark_enabled", False))
+    styles = _build_styles(theme_hex)
     elements = []
 
     # Resolve watermark text
