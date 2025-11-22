@@ -209,7 +209,74 @@ def _build_styles(theme_hex):
 
     return styles
     return styles
+# ---------- Header / Footer / Watermark ----------
+def _draw_header(canvas, doc, report, accent):
+    page = canvas.getPageNumber()
+    if page == 1:
+        # Fără header pe copertă
+        return
 
+    canvas.saveState()
+    w, h = A4
+
+    # bară ~30px (aprox 24pt)
+    bar_h = 24
+    canvas.setFillColor(accent)
+    canvas.rect(0, h - bar_h, w, bar_h, fill=1, stroke=0)
+
+    # logo stânga (convertit la JPEG RGB)
+    logo_b64 = report.get("logo_b64")
+    if logo_b64:
+        try:
+            raw = base64.b64decode(logo_b64)
+            img = PILImage.open(BytesIO(raw))
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            bio = BytesIO()
+            img.save(bio, format="JPEG")
+            bio.seek(0)
+            logo = ImageReader(bio)
+            canvas.drawImage(
+                logo,
+                10 * mm,
+                h - bar_h + 2,
+                width=14 * mm,
+                height=14 * mm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception:
+            pass
+
+    # Client – Project dreapta
+    client = report.get("client", "")
+    project = report.get("project", "")
+    text = f"{client} – {project}" if (client or project) else "Penetration Test Report"
+    canvas.setFillColor(colors.white)
+    canvas.setFont("Helvetica-Bold", 9)
+    canvas.drawRightString(w - 15 * mm, h - bar_h + 8, text)
+
+    canvas.restoreState()
+
+
+def _draw_footer(canvas, doc):
+    canvas.saveState()
+    w, h = A4
+    canvas.setFont("Helvetica", 8)
+    canvas.setFillColor(colors.grey)
+    canvas.drawRightString(w - 20 * mm, 10 * mm, f"Page {canvas.getPageNumber()}")
+    canvas.restoreState()
+
+
+def _add_watermark(canvas, text="CONFIDENTIAL"):
+    canvas.saveState()
+    canvas.setFont("Helvetica-Bold", 60)
+    canvas.setFillGray(0.9, 0.15)
+    w, h = A4
+    canvas.translate(w / 2, h / 2)
+    canvas.rotate(45)
+    canvas.drawCentredString(0, 0, text)
+    canvas.restoreState()
 
 # --------------------------------------------------------------------
 # DONUT CHART (used by Vulnerability Summary if needed)
