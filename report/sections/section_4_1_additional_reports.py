@@ -25,7 +25,7 @@ def build_section(elements, styles, report):
         images = r.get("images", []) or []
 
         # 7.x Title
-        elements.append(Paragraph(f"7.{idx} {title}", styles["SubHeading"]))
+        elements.append(Paragraph(f"9.{idx} {title}", styles["SubHeading"]))
         elements.append(Spacer(1, 4))
 
         # Description
