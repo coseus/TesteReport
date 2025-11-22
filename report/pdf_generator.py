@@ -790,11 +790,6 @@ def generate_pdf_bytes(report: dict) -> bytes:
     _build_additional_reports(elements, styles, report)
 
     # ==========================================================
-    # 9.0 Additional Reports
-    # ==========================================================
-    _build_additional_reports(elements, styles, report)
-
-    # ==========================================================
     # BUILD PDF WITH HEADER/FOOTER/WATERMARK
     # ==========================================================
     def all_pages(canvas, doc):
