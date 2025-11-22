@@ -79,56 +79,97 @@ def _add_watermark(canvas_obj, doc, text="CONFIDENTIAL"):
 # STYLES
 # --------------------------------------------------------------------
 def _get_styles():
+    accent = _hex_to_color(theme_hex)
     styles = getSampleStyleSheet()
 
-    styles.add(ParagraphStyle(
-        name="CenterTitle",
-        fontSize=18,
-        alignment=TA_CENTER,
-        spaceAfter=12,
-        fontName="Helvetica-Bold"
-    ))
+    styles.add(
+        ParagraphStyle(
+            name="ReportTitle",
+            fontName="Helvetica-Bold",
+            fontSize=28,
+            alignment=TA_CENTER,
+            textColor=accent,
+            spaceAfter=24,
+        )
+    )
 
-    styles.add(ParagraphStyle(
-        name="HeadingModern",
-        fontSize=14,
-        spaceBefore=10,
-        spaceAfter=6,
-        fontName="Helvetica-Bold"
-    ))
+    styles.add(
+        ParagraphStyle(
+            name="HeadingModern",
+            fontName="Helvetica-Bold",
+            fontSize=16,
+            textColor=accent,
+            spaceBefore=12,
+            spaceAfter=18,  # mai mult spațiu sub titlu
+        )
+    )
 
-    styles.add(ParagraphStyle(
-        name="SubHeading",
-        fontSize=12,
-        spaceBefore=8,
-        spaceAfter=4,
-        fontName="Helvetica-Bold"
-    ))
+    styles.add(
+        ParagraphStyle(
+            name="SubHeading",
+            fontName="Helvetica-Bold",
+            fontSize=12,
+            textColor=accent,
+            spaceBefore=10,
+            spaceAfter=8,
+        )
+    )
 
-    styles.add(ParagraphStyle(
-        name="NormalHelv",
-        fontSize=10,
-        leading=14,
-        fontName="Helvetica"
-    ))
+    styles.add(
+        ParagraphStyle(
+            name="NormalHelv",
+            fontName="Helvetica",
+            fontSize=10,
+            leading=14,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="TOCEntry",
+            fontName="Helvetica",
+            fontSize=10,
+            leading=13,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="PreText",
+            fontName="Helvetica",
+            fontSize=10,
+            leading=13,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="TableCell",
+            parent=styles["Normal"],
+            fontName="Helvetica",
+            fontSize=10,
+            leading=12,
+            allowHTML=True
+        )
+    )
 
-    styles.add(ParagraphStyle(
-        name="CodeBlock",
-        fontSize=8,
-        fontName="Courier",
-        leading=10
-    ))
+    styles.add(
+        ParagraphStyle(
+            name="CodeBlock",
+            fontName="Courier",
+            fontSize=8,
+            leading=10,
+        )
+    )
 
-    # For HTML in table cells
-    styles.add(ParagraphStyle(
-        name="TableCell",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=10,
-        leading=12,
-        allowHTML=True
-    ))
+    styles.add(
+        ParagraphStyle(
+            name="MetaSmall",
+            fontName="Helvetica",
+            fontSize=8,
+            leading=10,
+            textColor=colors.grey,
+        )
+    )
 
+    return styles
     return styles
 
 
