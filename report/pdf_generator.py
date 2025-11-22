@@ -61,6 +61,44 @@ from report.sections.section_7_0_remediation_summary import build_section as sec
 from report.sections.section_8_0_detailed_walkthrough import build_section as sec80
 
 
+# ---------- Helpers ----------
+def _hex_to_color(hex_str):
+    try:
+        return colors.HexColor(hex_str)
+    except Exception:
+        return colors.HexColor("#2E3B4E")
+
+
+def _truncate_title(title: str, max_words=7):
+    if not title:
+        return ""
+    words = title.split()
+    if len(words) <= max_words:
+        return title
+    return " ".join(words[:max_words]) + " ..."
+
+def _compute_vuln_summary(report):
+    """
+    Calculează:
+    - total pe severități (global)
+    (by_host rămâne dacă vrei să-l folosești ulterior, dar nu e folosit în v5)
+    """
+    findings = report.get("findings", []) or []
+    counts = {s: 0 for s in SEVERITIES_ORDER}
+    by_host = defaultdict(lambda: {s: 0 for s in SEVERITIES_ORDER})
+
+    for f in findings:
+        sev = f.get("severity", "Informational")
+        if sev not in SEVERITIES_ORDER:
+            sev = "Informational"
+        host = (f.get("host") or "Unknown").strip() or "Unknown"
+        counts[sev] += 1
+        by_host[host][sev] += 1
+
+    total = sum(counts.values())
+    report["vuln_summary_counts"] = counts
+    report["vuln_summary_total"] = total
+    report["vuln_by_host"] = by_host
 # --------------------------------------------------------------------
 # WATERMARK
 # --------------------------------------------------------------------
