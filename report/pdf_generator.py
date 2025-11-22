@@ -747,21 +747,22 @@ def generate_pdf_bytes(report: dict) -> bytes:
     elements.append(PageBreak())
 
     # ==========================================================
-    # PAGINA 4: 2.x + 3.0
+    # PAGINA 4: 4.0 Exec Summary + 5.0 Vulnerability Summary
     # ==========================================================
+    sec50(elements, styles, report)
+    sec51(elements, styles, report)
+    elements.append(PageBreak())
+
+    # ==========================================================
+    # PAGINA 5: 2.x + 3.0
+    # ==========================================================
+    sec30(elements, styles, report)
     sec20(elements, styles, report)
     sec21(elements, styles, report)
     sec22(elements, styles, report)
     sec23(elements, styles, report)
     sec24(elements, styles, report)
-    sec30(elements, styles, report)
-    elements.append(PageBreak())
-
-    # ==========================================================
-    # PAGINA 5: 4.0 Exec Summary + 5.0 Vulnerability Summary
-    # ==========================================================
-    sec50(elements, styles, report)
-    sec51(elements, styles, report)
+    
     elements.append(PageBreak())
 
     # ==========================================================
