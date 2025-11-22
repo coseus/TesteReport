@@ -44,6 +44,7 @@ from reportlab.platypus import Preformatted
 
 from util.helpers import format_multiline as _format_text
 from util.helpers import preformat as _pre
+from util.helpers import pdf_safe_image
 
 # SECTION IMPORTS (1.x, 2.x, 3.0, 4.0, 5.0 text)
 from report.sections.section_1_0_confidentiality_and_legal import build_section as sec10
@@ -419,7 +420,7 @@ def _build_additional_reports(elements, styles, report):
     if not additional:
         return
 
-    elements.append(Paragraph("7.0 Additional Reports & Scans", styles["HeadingModern"]))
+    elements.append(Paragraph("9.0 Additional Reports & Scans", styles["HeadingModern"]))
     elements.append(Spacer(1, 6))
 
     for idx, r in enumerate(additional, start=1):
@@ -429,7 +430,7 @@ def _build_additional_reports(elements, styles, report):
         images = r.get("images", []) or []
 
         elements.append(
-            Paragraph(f"7.{idx} {title}", styles["SubHeading"])
+            Paragraph(f"9.{idx} {title}", styles["SubHeading"])
         )
         elements.append(Spacer(1, 2))
 
