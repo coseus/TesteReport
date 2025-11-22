@@ -770,7 +770,24 @@ def generate_pdf_bytes(report: dict) -> bytes:
     elements.append(PageBreak())
 
     # ==========================================================
-    # 7.0 Additional Reports
+# 7.0 Remediation Summary
+# ==========================================================
+    _build_remediation_summary(elements, styles, report)
+    elements.append(PageBreak())
+    
+    # ==========================================================
+    # 8.0 Detailed Walkthrough
+    # ==========================================================
+    _build_detailed_walkthrough(elements, styles, report)
+    elements.append(PageBreak())
+    
+    # ==========================================================
+    # 9.0 Additional Reports & Scans
+    # ==========================================================
+    _build_additional_reports(elements, styles, report)
+
+    # ==========================================================
+    # 9.0 Additional Reports
     # ==========================================================
     _build_additional_reports(elements, styles, report)
 
