@@ -5,7 +5,7 @@ from util.helpers import format_multiline, preformat
 from reportlab.lib.units import mm
 
 def build_section(elements, styles, report):
-    elements.append(Paragraph("2.0 Finding Severity Ratings", styles["HeadingModern"]))
+    elements.append(Paragraph("1.4 Finding Severity Ratings", styles["HeadingModern"]))
 
     table_data = [
         ["Severity", "CVSS Range", "Definition"],
