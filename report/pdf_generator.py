@@ -116,7 +116,7 @@ def _add_watermark(canvas_obj, doc, text="CONFIDENTIAL"):
 # --------------------------------------------------------------------
 # STYLES
 # --------------------------------------------------------------------
-def _get_styles():
+def _build_styles(theme_hex):
     accent = _hex_to_color(theme_hex)
     styles = getSampleStyleSheet()
 
