@@ -21,22 +21,27 @@ New structure:
 """
 
 from io import BytesIO
-import io
 import base64
-from datetime import datetime
+from collections import defaultdict
+
 from PIL import Image as PILImage
-import matplotlib.pyplot as plt
 
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, PageBreak, Image as RLImage,
-    Table, TableStyle
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    PageBreak,
+    Table,
+    TableStyle,
+    Image as RLImage,
 )
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.units import mm
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
-from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
+from reportlab.lib.utils import ImageReader
+from reportlab.platypus import Preformatted
 
 from report.sections.section_1_0_confidentiality_and_legal import build_section as sec10
 from report.sections.section_1_1_confidentiality_statement import build_section as sec11
