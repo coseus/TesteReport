@@ -101,7 +101,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
         # EDIT MODAL
         # ----------------------------------------------------------------
         if st.session_state["dw_edit_idx"] == idx:
-            with st.modal(f"Edit 8.{idx+1} — {item['name']}"):
+            with st.dialog(f"Edit 8.{idx+1} — {item['name']}"):
 
                 new_name = st.text_input("Title / Name", item["name"], key=f"dw_edit_name_{idx}")
                 new_desc = st.text_area("Description", item["description"], height=120, key=f"dw_edit_desc_{idx}")
