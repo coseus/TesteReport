@@ -202,48 +202,26 @@ def _build_styles(theme_hex):
 def _draw_header(canvas, doc, report, accent):
     page = canvas.getPageNumber()
     if page == 1:
-        # Fără header pe copertă
-        return
+        return  # Nu adăugăm header pe copertă
 
     canvas.saveState()
     w, h = A4
 
-    # bară ~30px (aprox 24pt)
+    # Bară corporate de 30px
     bar_h = 24
     canvas.setFillColor(accent)
     canvas.rect(0, h - bar_h, w, bar_h, fill=1, stroke=0)
 
-    # logo stânga (convertit la JPEG RGB)
-    logo_b64 = report.get("logo_b64")
-    if logo_b64:
-        try:
-            raw = base64.b64decode(logo_b64)
-            img = PILImage.open(BytesIO(raw))
-            if img.mode != "RGB":
-                img = img.convert("RGB")
-            bio = BytesIO()
-            img.save(bio, format="JPEG")
-            bio.seek(0)
-            logo = ImageReader(bio)
-            canvas.drawImage(
-                logo,
-                10 * mm,
-                h - bar_h + 2,
-                width=14 * mm,
-                height=14 * mm,
-                preserveAspectRatio=True,
-                mask="auto",
-            )
-        except Exception:
-            pass
-
-    # Client – Project dreapta
+    # Text centrat (Client – Project)
     client = report.get("client", "")
     project = report.get("project", "")
     text = f"{client} – {project}" if (client or project) else "Penetration Test Report"
+
     canvas.setFillColor(colors.white)
-    canvas.setFont("Helvetica-Bold", 9)
-    canvas.drawRightString(w - 15 * mm, h - bar_h + 8, text)
+    canvas.setFont("Helvetica-Bold", 10)
+
+    # Centrare perfectă
+    canvas.drawCentredString(w / 2, h - bar_h + 8, text)
 
     canvas.restoreState()
 
