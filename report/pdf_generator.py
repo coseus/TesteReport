@@ -764,7 +764,7 @@ def generate_pdf_bytes(report: dict) -> bytes:
     sec23(elements, styles, report)
     sec24(elements, styles, report)
     
-    elements.append(PageBreak())
+    #elements.append(PageBreak())
 
     # ==========================================================
     # PAGINA 6+: 6.0 Technical Findings
