@@ -132,7 +132,7 @@ def render_export_tab(report_data: dict):
 
         if docx_data:
             st.download_button(
-                label="ðŸ“¥ Download DOCX",
+                label="⬇️ Download DOCX",
                 data=docx_data,
                 file_name=f"{fname}.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
