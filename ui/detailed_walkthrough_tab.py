@@ -118,7 +118,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
         idx = st.session_state["dw_edit_index"]
         item = walkthrough[idx]
 
-        with st.modal(f"Edit Walkthrough Step 8.{idx+1} — {item['name']}"):
+        with st.dialog(f"Edit Walkthrough Step 8.{idx+1} — {item['name']}"):
 
             # Title
             item["name"] = st.text_input(
