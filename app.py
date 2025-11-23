@@ -67,30 +67,20 @@ if "report_data" not in st.session_state:
 with st.sidebar:
     st.title("⚙️ Settings")
 
-    # ------------------------
-    # RESET ALL DATA (GLOBAL)
-    # ------------------------
-    if st.button("🗑 Reset All Data"):
+    if st.button("🗑 Reset All Data", key="reset_all_btn"):
         import os
+        # 1. Clear ALL Session State
+        st.session_state.clear()
 
-        # 1. Clear session state completely
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-
-        # 2. Remove saved JSON file
+        # 2. Remove saved JSON
         if os.path.exists("data/saved_report.json"):
             try:
                 os.remove("data/saved_report.json")
             except:
                 pass
 
-        # 3. Reinitialize empty state
-        st.session_state["report_data"] = {}
-
-        st.success("All data has been reset.")
-        st.rerun()
-
-    st.caption("Data is auto-saved to `data/saved_report.json`")
+        # 3. Force full page reload
+        st.experimental_rerun()
 
 # ---------------------------------------------------------
 # MAIN TABS
@@ -134,6 +124,7 @@ with tab8:
 
 # Save at end
 save_report_data()
+
 
 
 
