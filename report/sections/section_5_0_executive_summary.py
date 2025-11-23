@@ -12,7 +12,7 @@ def build_section(elements, styles, report):
     elements.append(Preformatted(preformat(text), styles["PreText"]))
     elements.append(Spacer(1, 14))
 '''
-from reportlab.platypus import Paragraph, Spacer
+from reportlab.platypus import Paragraph, Spacer, Preformatted
 from util.helpers import format_multiline
 
 def build_section(elements, styles, report):
