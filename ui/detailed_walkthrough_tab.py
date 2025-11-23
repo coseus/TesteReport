@@ -5,34 +5,29 @@ from util.helpers import resize_image_b64
 
 
 def render_detailed_walkthrough_tab(report_data: dict):
-    """
-    UI Tab for section 8.0 Detailed Walkthrough.
-    Allows: Add steps, list steps, edit steps, delete steps.
-    """
 
     st.header("🔍 8.0 Detailed Walkthrough")
-    st.caption("Add detailed attack chains, lateral movement paths, exploit steps, screenshots and code samples.")
+    st.caption("Add detailed attack chains, exploit steps, lateral movement, screenshots, code samples.")
 
-    # Ensure data structure exists
+    # Ensure structure
     if "detailed_walkthrough" not in report_data or not isinstance(report_data["detailed_walkthrough"], list):
         report_data["detailed_walkthrough"] = []
 
     walkthrough = report_data["detailed_walkthrough"]
 
     # ======================================================
-    # 1. ADD NEW STEP
+    # ADD NEW STEP
     # ======================================================
-    st.subheader("➕ Add Walkthrough Step")
+    with st.expander("➕ Add Walkthrough Step", expanded=False):
 
-    with st.expander("Add Walkthrough Step", expanded=False):
         title = st.text_input("Title", key="dw_new_title")
         description = st.text_area("Description (multiline)", key="dw_new_desc")
         code = st.text_area("Code Block (optional)", key="dw_new_code")
 
         images_upload = st.file_uploader(
-            "Upload Screenshots",
-            type=["png", "jpg", "jpeg"],
+            "Upload screenshots",
             accept_multiple_files=True,
+            type=["png", "jpg", "jpeg"],
             key="dw_new_images",
         )
 
@@ -40,57 +35,52 @@ def render_detailed_walkthrough_tab(report_data: dict):
             images_b64 = []
             if images_upload:
                 for img in images_upload:
-                    # citim bytes -> redimensionăm -> stocăm ca base64 text
                     raw = img.read()
-                    b64 = resize_image_b64(raw, max_size=900)
+                    b64 = resize_image_b64(raw)
                     images_b64.append(b64)
 
-            walkthrough.append(
-                {
-                    "name": title.strip() or "Untitled Step",
-                    "description": description,
-                    "code": code,
-                    "images": images_b64,
-                }
-            )
+            walkthrough.append({
+                "name": title.strip() or "Untitled Step",
+                "description": description,
+                "code": code,
+                "images": images_b64,
+            })
 
-            st.success("Walkthrough step added!")
+            st.success("Step added!")
             st.rerun()
 
     st.markdown("---")
 
     # ======================================================
-    # 2. LIST EXISTING STEPS
+    # LIST EXISTING STEPS
     # ======================================================
     st.subheader("📄 Existing Walkthrough Steps")
 
     if not walkthrough:
-        st.info("No walkthrough steps added yet.")
+        st.info("No steps added yet.")
         return report_data
 
     for idx, step in enumerate(walkthrough):
-        box = st.container(border=True)
 
+        box = st.container(border=True)
         with box:
             st.markdown(f"### **8.{idx+1} – {step['name']}**")
 
             if step.get("description"):
-                st.markdown(step["description"].replace("\n", "<br/>"), unsafe_allow_html=True)
+                st.markdown(step["description"].replace("\n", "<br>"), unsafe_allow_html=True)
 
             if step.get("code"):
                 st.code(step["code"], language="bash")
 
             if step.get("images"):
-                for img_b64 in step["images"]:
+                st.markdown("**Images:**")
+                for b64 in step["images"]:
                     try:
-                        # img_b64 este string base64 → decodăm în bytes
-                        img_bytes = base64.b64decode(img_b64)
-                        st.image(img_bytes, use_column_width=True)
-                    except Exception:
-                        continue
+                        st.image(base64.b64decode(b64), use_container_width=True)
+                    except:
+                        pass
 
             col1, col2 = st.columns(2)
-
             with col1:
                 if st.button("✏️ Edit", key=f"dw_edit_btn_{idx}"):
                     st.session_state["dw_edit_index"] = idx
@@ -99,24 +89,27 @@ def render_detailed_walkthrough_tab(report_data: dict):
             with col2:
                 if st.button("🗑 Delete", key=f"dw_del_btn_{idx}"):
                     del walkthrough[idx]
-                    st.success("Walkthrough step deleted.")
+                    st.success("Deleted.")
                     st.rerun()
 
         st.markdown("---")
 
     # ======================================================
-    # 3. EDIT MODAL
+    # EDIT MODAL (SIMULATED)
     # ======================================================
     if st.session_state.get("dw_edit_index") is not None:
+
         idx = st.session_state["dw_edit_index"]
-        # dacă între timp s-a șters ceva, protejăm indexul
+
+        # Safety
         if idx < 0 or idx >= len(walkthrough):
             st.session_state["dw_edit_index"] = None
             return report_data
 
         step = walkthrough[idx]
 
-        with st.dialog(f"Edit Walkthrough Step 8.{idx+1} — {step['name']}"):
+        with st.container(border=True):
+            st.markdown(f"## ✏️ Edit Walkthrough Step 8.{idx+1}")
 
             # Title
             step["name"] = st.text_input(
@@ -128,7 +121,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
             # Description
             step["description"] = st.text_area(
                 "Description",
-                step["description"],
+                step.get("description", ""),
                 height=150,
                 key=f"dw_edit_desc_{idx}",
             )
@@ -144,41 +137,41 @@ def render_detailed_walkthrough_tab(report_data: dict):
             # Existing images
             st.markdown("### Existing Images")
             if step.get("images"):
-                for i, img_b64 in enumerate(step["images"]):
+                for i, b64 in enumerate(step["images"]):
                     try:
-                        img_bytes = base64.b64decode(img_b64)
-                        st.image(img_bytes, use_column_width=True)
-                    except Exception:
-                        continue
+                        st.image(base64.b64decode(b64), use_container_width=True)
+                    except:
+                        pass
 
-                    if st.button(f"🗑 Delete Image {i+1}", key=f"dw_edit_del_img_{idx}_{i}"):
+                    if st.button(f"🗑 Delete Image {i+1}", key=f"dw_del_img_{idx}_{i}"):
                         del step["images"][i]
                         st.rerun()
 
             # Add new images
             st.markdown("### Add More Images")
-            edit_imgs = st.file_uploader(
-                "Upload additional screenshots",
-                type=["png", "jpg", "jpeg"],
+            new_imgs = st.file_uploader(
+                "Upload screenshots",
                 accept_multiple_files=True,
-                key=f"dw_edit_images_{idx}",
+                type=["png", "jpg", "jpeg"],
+                key=f"dw_edit_new_images_{idx}",
             )
 
-            if edit_imgs:
-                for img in edit_imgs:
+            if new_imgs:
+                for img in new_imgs:
                     raw = img.read()
-                    b64 = resize_image_b64(raw, max_size=900)
+                    b64 = resize_image_b64(raw)
                     step["images"].append(b64)
 
             st.markdown("---")
 
-            col_s1, col_s2 = st.columns(2)
-            with col_s1:
+            colA, colB = st.columns(2)
+            with colA:
                 if st.button("💾 Save Changes", key=f"dw_save_{idx}"):
                     st.session_state["dw_edit_index"] = None
-                    st.success("Updated successfully.")
+                    st.success("Updated.")
                     st.rerun()
-            with col_s2:
+
+            with colB:
                 if st.button("❌ Cancel", key=f"dw_cancel_{idx}"):
                     st.session_state["dw_edit_index"] = None
                     st.rerun()
