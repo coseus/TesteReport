@@ -144,164 +144,143 @@ def render_export_tab(report_data: dict):
     st.markdown("---")
 
 # -----------------------------------------------------------
-# JSON IMPORT / EXPORT (Enhanced with Auto-Validate & Selective Import)
+# FULL JSON IMPORT / EXPORT (Auto-Validate + Auto-Repair)
 # -----------------------------------------------------------
-    st.subheader("💾 JSON Save / Load")
+st.subheader("💾 JSON Save / Load")
+
+# --- Save JSON on server ---
+if st.button("💾 Save JSON to Server"):
+    try:
+        with open(SAVE_FILE, "w", encoding="utf-8") as f:
+            json.dump(report_data, f, indent=2, ensure_ascii=False, default=str)
+        st.success("JSON saved to server.")
+    except Exception as e:
+        st.error(f"Error saving JSON: {e}")
+
+# --- Download JSON ---
+json_bytes = json.dumps(report_data, indent=2, ensure_ascii=False, default=str).encode("utf-8")
+
+st.download_button(
+    "📥 Download JSON",
+    data=json_bytes,
+    file_name=f"Pentest_Report_{report_data.get('client','Client')}.json",
+    mime="application/json",
+    use_container_width=True
+)
+
+st.markdown("---")
+
+# ===========================================================
+# AUTO-REPAIR FUNCTION (fix emoji corruption / missing fields)
+# ===========================================================
+def _repair_emoji(text):
+    if not isinstance(text, str):
+        return text
+    bad_to_good = {
+        "ðŸ“¤": "📤",
+        "ðŸ“…": "📁",
+        "ðŸ“¥": "💾",
+        "â¬‡ï¸": "⬇️",
+        "âœ•": "✖️",
+        "âœ”": "✔️",
+    }
+    for bad, good in bad_to_good.items():
+        text = text.replace(bad, good)
+    return text
+
+def _repair_structure(obj):
+    if isinstance(obj, dict):
+        return {k: _repair_structure(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_repair_structure(v) for v in obj]
+    if isinstance(obj, str):
+        return _repair_emoji(obj)
+    return obj
+
+# ===========================================================
+# TEMPLATE FOR AUTO-FILLING missing keys
+# ===========================================================
+TEMPLATE = {
+    "client": "",
+    "project": "",
+    "tester": "",
+    "contact": "",
+    "date": "",
+    "version": "1.0",
     
-    # --- Save JSON to server ---
-    if st.button("💾 Save JSON to Server"):
-        try:
-            with open(SAVE_FILE, "w", encoding="utf-8") as f:
-                json.dump(report_data, f, indent=2, ensure_ascii=False, default=str)
-            st.success("JSON saved on server.")
-        except Exception as e:
-            st.error(f"Error saving JSON: {e}")
+    "theme_hex": "#ED863D",
+    "watermark_enabled": False,
+    "logo_b64": "",
     
-    # --- Download JSON directly ---
-    json_bytes = json.dumps(report_data, indent=2, ensure_ascii=False, default=str).encode("utf-8")
+    # Executive + Assessment
+    "executive_summary": "",
+    "assessment_overview": "",
+    "assessment_details": "",
+    "scope": "",
+    "scope_exclusions": "",
+    "client_allowances": "",
     
-    st.download_button(
-        label="📥 Download JSON",
-        data=json_bytes,
-        file_name=f"Pentest_Report_{report_data.get('client','Client')}.json",
-        mime="application/json",
-        use_container_width=True
-    )
+    # Findings
+    "findings": [],
     
-    st.markdown("---")
+    # Additional Reports
+    "additional_reports": [],
     
-    # --- Import JSON ---
+    # Walkthrough
+    "detailed_walkthrough": [],
     
-    uploaded_json = st.file_uploader(
-        "📂 Import JSON Report",
-        type=["json"],
-        key="json_importer"
-    )
+    # Remediation Summary
+    "remediation_short": [],
+    "remediation_medium": [],
+    "remediation_long": [],
     
-    # ---------------------------------------------
-    # AUTO-VALIDATOR for JSON structure
-    # ---------------------------------------------
-    def _validate_json_structure(data: dict) -> dict:
-        """Auto-repair missing fields in imported JSON."""
-        TEMPLATE = {
-            "client": "",
-            "project": "",
-            "tester": "",
-            "contact": "",
-            "date": "",
-            "version": "1.0",
-            "theme_hex": "#ED863D",
-            "watermark_enabled": False,
-    
-            "executive_summary": "",
-            "assessment_overview": "",
-            "assessment_details": "",
-            "scope": "",
-            "scope_exclusions": "",
-            "client_allowances": "",
-    
-            "findings": [],
-            "additional_reports": [],
-            "detailed_walkthrough": [],
-    
-            "remediation_short": [],
-            "remediation_medium": [],
-            "remediation_long": [],
-    
-            "vuln_summary_counts": {},
-            "vuln_summary_total": 0,
-            "vuln_by_host": {},
-    
-            "logo_b64": "",
-        }
-    
-        repaired = TEMPLATE.copy()
-    
-        # merge keys safely
-        for k, v in data.items():
-            if k in repaired:
-                repaired[k] = v  # overwrite allowed
-            else:
-                # unknown key -> keep it so user data is not lost
-                repaired[k] = v
-    
-        return repaired
-    
-    
-    # ---------------------------------------------
-    # SELECTIVE IMPORT
-    # ---------------------------------------------
-    if uploaded_json:
-        try:
-            imported = json.loads(uploaded_json.read().decode("utf-8"))
-            imported = _validate_json_structure(imported)
-    
-            st.success("JSON loaded. Choose what to import:")
-    
-            with st.expander("🧩 Selective Import Options", expanded=True):
-    
-                import_all = st.checkbox("Import EVERYTHING", value=False)
-    
-                colA, colB, colC = st.columns(3)
-    
-                with colA:
-                    imp_client = st.checkbox("Client Information")
-                    imp_scope = st.checkbox("Assessment & Scope")
-                    imp_exec = st.checkbox("Executive Summary")
-    
-                with colB:
-                    imp_findings = st.checkbox("Findings")
-                    imp_reports = st.checkbox("Additional Reports")
-                    imp_walk = st.checkbox("Detailed Walkthrough")
-    
-                with colC:
-                    imp_remed = st.checkbox("Remediation Summary")
-                    imp_theme = st.checkbox("Theme & Watermark")
-    
-            if st.button("⬆️ Apply Import"):
-    
-                if import_all:
-                    st.session_state["report_data"] = imported
-                    st.success("Imported ALL data.")
-                    st.rerun()
-                
-                # otherwise, partial import
-                rd = st.session_state["report_data"]
-    
-                if imp_client:
-                    for key in ["client", "project", "tester", "contact", "date", "version"]:
-                        rd[key] = imported[key]
-    
-                if imp_scope:
-                    for key in ["assessment_overview", "assessment_details", "scope", "scope_exclusions", "client_allowances"]:
-                        rd[key] = imported[key]
-    
-                if imp_exec:
-                    rd["executive_summary"] = imported["executive_summary"]
-    
-                if imp_findings:
-                    rd["findings"] = imported["findings"]
-    
-                if imp_reports:
-                    rd["additional_reports"] = imported["additional_reports"]
-    
-                if imp_walk:
-                    rd["detailed_walkthrough"] = imported["detailed_walkthrough"]
-    
-                if imp_remed:
-                    for k in ["remediation_short", "remediation_medium", "remediation_long"]:
-                        rd[k] = imported[k]
-    
-                if imp_theme:
-                    rd["theme_hex"] = imported["theme_hex"]
-                    rd["watermark_enabled"] = imported["watermark_enabled"]
-                    rd["logo_b64"] = imported["logo_b64"]
-    
-                st.success("Selected data imported successfully.")
-                st.rerun()
-    
-        except Exception as e:
-            st.error(f"JSON Import Error: {e}")
+    # Vulnerability Summary cache
+    "vuln_summary_counts": {},
+    "vuln_summary_total": 0,
+    "vuln_by_host": {},
+}
+
+def _merge_with_template(data):
+    fixed = TEMPLATE.copy()
+    for k, v in data.items():
+        fixed[k] = v
+    return fixed
+
+
+# ===========================================================
+# JSON IMPORT (FULL MODE)
+# ===========================================================
+
+st.subheader("📂 Import JSON Report")
+
+uploaded_json = st.file_uploader(
+    "Choose JSON file",
+    type=["json"],
+    key="json_importer"
+)
+
+if uploaded_json:
+    try:
+        raw = uploaded_json.read().decode("utf-8")
+
+        # 1. Load JSON first
+        data = json.loads(raw)
+
+        # 2. Auto-repair encoding issues
+        data = _repair_structure(data)
+
+        # 3. Auto-fill missing keys
+        data = _merge_with_template(data)
+
+        # 4. Apply straight into session_state
+        st.session_state["report_data"] = data
+
+        st.success("✅ JSON imported successfully. Reloading interface...")
+        st.rerun()
+
+    except Exception as e:
+        st.error(f"❌ JSON Import Error: {e}")
+
 
     # -----------------------------------------------------------
     # EXPORT SUMMARY
