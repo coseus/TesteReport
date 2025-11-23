@@ -522,8 +522,8 @@ def _build_detailed_walkthrough(elements, styles, report):
         }
     ]
     """
-    from util.helpers import pdf_safe_image
-    import base64
+    #from util.helpers import pdf_safe_image
+    #import base64
 
     elements.append(Paragraph("8.0 Detailed Walkthrough", styles["HeadingModern"]))
     elements.append(Spacer(1, 8))
