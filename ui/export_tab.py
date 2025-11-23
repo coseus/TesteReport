@@ -20,7 +20,7 @@ SAVE_FILE = "data/saved_report.json"
 
 
 # -------------------------------------------------------
-# JSON SAVE
+# JSON SAVE (helper – folosit de butonul de save local)
 # -------------------------------------------------------
 def save_json_file(report):
     try:
@@ -33,7 +33,7 @@ def save_json_file(report):
 
 
 # -------------------------------------------------------
-# JSON LOAD
+# JSON LOAD (helper – load din fișierul local)
 # -------------------------------------------------------
 def _load_json_from_disk():
     try:
@@ -60,7 +60,7 @@ def _generate_docx(report):
 # -------------------------------------------------------
 def render_export_tab(report_data: dict):
 
-    st.header("ðŸ“¤ Export Final Report")
+    st.header("📤 Export Final Report")
 
     # -----------------------------------------------------------
     # THEME COLOR
@@ -89,7 +89,7 @@ def render_export_tab(report_data: dict):
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("📤 Generate PDF Report"):
+        if st.button("📄 Generate PDF Report"):
             with st.spinner("Generating PDF report..."):
                 try:
                     pdf_bytes = _generate_pdf(report_data)
@@ -99,7 +99,7 @@ def render_export_tab(report_data: dict):
                     st.error(f"Error generating PDF: {e}")
 
     with col2:
-        if st.button("📄 Generate DOCX Report"):
+        if st.button("📝 Generate DOCX Report"):
             with st.spinner("Generating DOCX report..."):
                 try:
                     docx_bytes = _generate_docx(report_data)
@@ -123,7 +123,7 @@ def render_export_tab(report_data: dict):
 
         if pdf_data:
             st.download_button(
-                label="⬇️ Download PDF",
+                label="📥 Download PDF",
                 data=pdf_data,
                 file_name=f"{fname}.pdf",
                 mime="application/pdf",
@@ -132,7 +132,7 @@ def render_export_tab(report_data: dict):
 
         if docx_data:
             st.download_button(
-                label="⬇️ Download DOCX",
+                label="📥 Download DOCX",
                 data=docx_data,
                 file_name=f"{fname}.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -158,7 +158,12 @@ def render_export_tab(report_data: dict):
             st.error(f"Error saving JSON: {e}")
     
     # --- Download JSON ---
-    json_bytes = json.dumps(report_data, indent=2, ensure_ascii=False, default=str).encode("utf-8")
+    json_bytes = json.dumps(
+        report_data,
+        indent=2,
+        ensure_ascii=False,
+        default=str
+    ).encode("utf-8")
     
     st.download_button(
         "📥 Download JSON",
@@ -285,15 +290,17 @@ def render_export_tab(report_data: dict):
     # -----------------------------------------------------------
     # EXPORT SUMMARY
     # -----------------------------------------------------------
-    st.subheader("ðŸ§¾ Export Summary")
+    st.subheader("🧾 Export Summary")
     st.text(f"Client: {report_data.get('client','N/A')}")
     st.text(f"Project: {report_data.get('project','N/A')}")
     st.text(f"Tester: {report_data.get('tester','N/A')}")
     st.text(f"Findings: {len(report_data.get('findings', []))}")
     st.text(f"Additional Reports: {len(report_data.get('additional_reports', []))}")
     st.text(f"Detailed Walkthrough: {len(report_data.get('detailed_walkthrough', []))}")
-    st.text(f"Remediation Items: "
-            f"{len(report_data.get('remediation_short', [])) + len(report_data.get('remediation_medium', [])) + len(report_data.get('remediation_long', []))}")
+    st.text(
+        "Remediation Items: "
+        f"{len(report_data.get('remediation_short', [])) + len(report_data.get('remediation_medium', [])) + len(report_data.get('remediation_long', []))}"
+    )
     st.text(f"Date: {report_data.get('date','')}")
-
-    st.caption("Export includes all corporate sections: cover, TOC, sections 1â€“9, images, walkthrough, remediation summary.")
+    
+    st.caption("Export includes all corporate sections: cover, TOC, sections 1–9, images, walkthrough, remediation summary.")
