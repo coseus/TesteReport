@@ -80,7 +80,7 @@ with st.sidebar:
                 pass
 
         # 3. Force full page reload
-        st.experimental_rerun()
+        st.rerun()
 
 # ---------------------------------------------------------
 # MAIN TABS
@@ -124,6 +124,7 @@ with tab8:
 
 # Save at end
 save_report_data()
+
 
 
 
