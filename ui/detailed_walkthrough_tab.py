@@ -1,3 +1,4 @@
+#ui/detailed_walkthrough_tab.py
 import streamlit as st
 import base64
 from util.helpers import resize_image_b64
