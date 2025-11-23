@@ -17,12 +17,12 @@ def render_additional_reports(report_data: dict):
     if "edit_additional_idx" not in st.session_state:
         st.session_state["edit_additional_idx"] = None
 
-    st.subheader("ðŸ“„ Additional Reports & Scans")
+    st.subheader("📄 Additional Reports & Scans")
 
     # -------------------------------------------------------
     # ADD NEW
     # -------------------------------------------------------
-    st.markdown("### âž• Add Additional Report / Scan")
+    st.markdown("➕ Add Additional Report / Scan")
 
     with st.form("add_additional_report_form"):
         name = st.text_input("Title / Name")
@@ -58,7 +58,7 @@ def render_additional_reports(report_data: dict):
     # -------------------------------------------------------
     # LIST EXISTING
     # -------------------------------------------------------
-    st.markdown("### ðŸ“‘ Existing Additional Reports")
+    st.markdown("📑 Existing Additional Reports")
 
     if not items:
         st.info("No additional reports added.")
