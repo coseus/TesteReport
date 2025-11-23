@@ -1,22 +1,6 @@
 # report/pdf_generator.py
 """
 Advanced Corporate PDF Generator — ULTRA EDITION v5 (final)
-
-Structură & paginare:
-- Pagina 1: Cover (fără header)
-- Pagina 2: Table of Contents
-- Pagina 3: 1.x Confidentiality & Legal (1.0–1.3)
-- Pagina 4: 2.x Assessment + 3.0 Finding Severity Ratings
-- Pagina 5: 4.0 Executive Summary + 5.0 Vulnerability Summary
-- Pagina 6+: 6.0 Technical Findings (6.x Findings, cu poze)
-- După: 7.0 Additional Reports & Scans (7.x, cu poze)
-
-Features:
-- Header bar ~30px, logo stânga (RGB JPEG), Client – Project dreapta
-- Footer cu număr de pagină
-- Watermark opțional
-- Imagini sigure (RGB JPEG, deduplicate) în Findings & Additional Reports
-- Vulnerability Summary text + tabel (heatmap compact eliminat)
 """
 
 from io import BytesIO
