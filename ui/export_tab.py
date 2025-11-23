@@ -143,143 +143,143 @@ def render_export_tab(report_data: dict):
 
     st.markdown("---")
 
-# -----------------------------------------------------------
-# FULL JSON IMPORT / EXPORT (Auto-Validate + Auto-Repair)
-# -----------------------------------------------------------
-st.subheader("💾 JSON Save / Load")
-
-# --- Save JSON on server ---
-if st.button("💾 Save JSON to Server"):
-    try:
-        with open(SAVE_FILE, "w", encoding="utf-8") as f:
-            json.dump(report_data, f, indent=2, ensure_ascii=False, default=str)
-        st.success("JSON saved to server.")
-    except Exception as e:
-        st.error(f"Error saving JSON: {e}")
-
-# --- Download JSON ---
-json_bytes = json.dumps(report_data, indent=2, ensure_ascii=False, default=str).encode("utf-8")
-
-st.download_button(
-    "📥 Download JSON",
-    data=json_bytes,
-    file_name=f"Pentest_Report_{report_data.get('client','Client')}.json",
-    mime="application/json",
-    use_container_width=True
-)
-
-st.markdown("---")
-
-# ===========================================================
-# AUTO-REPAIR FUNCTION (fix emoji corruption / missing fields)
-# ===========================================================
-def _repair_emoji(text):
-    if not isinstance(text, str):
+    # -----------------------------------------------------------
+    # FULL JSON IMPORT / EXPORT (Auto-Validate + Auto-Repair)
+    # -----------------------------------------------------------
+    st.subheader("💾 JSON Save / Load")
+    
+    # --- Save JSON on server ---
+    if st.button("💾 Save JSON to Server"):
+        try:
+            with open(SAVE_FILE, "w", encoding="utf-8") as f:
+                json.dump(report_data, f, indent=2, ensure_ascii=False, default=str)
+            st.success("JSON saved to server.")
+        except Exception as e:
+            st.error(f"Error saving JSON: {e}")
+    
+    # --- Download JSON ---
+    json_bytes = json.dumps(report_data, indent=2, ensure_ascii=False, default=str).encode("utf-8")
+    
+    st.download_button(
+        "📥 Download JSON",
+        data=json_bytes,
+        file_name=f"Pentest_Report_{report_data.get('client','Client')}.json",
+        mime="application/json",
+        use_container_width=True
+    )
+    
+    st.markdown("---")
+    
+    # ===========================================================
+    # AUTO-REPAIR FUNCTION (fix emoji corruption / missing fields)
+    # ===========================================================
+    def _repair_emoji(text):
+        if not isinstance(text, str):
+            return text
+        bad_to_good = {
+            "ðŸ“¤": "📤",
+            "ðŸ“…": "📁",
+            "ðŸ“¥": "💾",
+            "â¬‡ï¸": "⬇️",
+            "âœ•": "✖️",
+            "âœ”": "✔️",
+        }
+        for bad, good in bad_to_good.items():
+            text = text.replace(bad, good)
         return text
-    bad_to_good = {
-        "ðŸ“¤": "📤",
-        "ðŸ“…": "📁",
-        "ðŸ“¥": "💾",
-        "â¬‡ï¸": "⬇️",
-        "âœ•": "✖️",
-        "âœ”": "✔️",
+    
+    def _repair_structure(obj):
+        if isinstance(obj, dict):
+            return {k: _repair_structure(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [_repair_structure(v) for v in obj]
+        if isinstance(obj, str):
+            return _repair_emoji(obj)
+        return obj
+    
+    # ===========================================================
+    # TEMPLATE FOR AUTO-FILLING missing keys
+    # ===========================================================
+    TEMPLATE = {
+        "client": "",
+        "project": "",
+        "tester": "",
+        "contact": "",
+        "date": "",
+        "version": "1.0",
+        
+        "theme_hex": "#ED863D",
+        "watermark_enabled": False,
+        "logo_b64": "",
+        
+        # Executive + Assessment
+        "executive_summary": "",
+        "assessment_overview": "",
+        "assessment_details": "",
+        "scope": "",
+        "scope_exclusions": "",
+        "client_allowances": "",
+        
+        # Findings
+        "findings": [],
+        
+        # Additional Reports
+        "additional_reports": [],
+        
+        # Walkthrough
+        "detailed_walkthrough": [],
+        
+        # Remediation Summary
+        "remediation_short": [],
+        "remediation_medium": [],
+        "remediation_long": [],
+        
+        # Vulnerability Summary cache
+        "vuln_summary_counts": {},
+        "vuln_summary_total": 0,
+        "vuln_by_host": {},
     }
-    for bad, good in bad_to_good.items():
-        text = text.replace(bad, good)
-    return text
-
-def _repair_structure(obj):
-    if isinstance(obj, dict):
-        return {k: _repair_structure(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_repair_structure(v) for v in obj]
-    if isinstance(obj, str):
-        return _repair_emoji(obj)
-    return obj
-
-# ===========================================================
-# TEMPLATE FOR AUTO-FILLING missing keys
-# ===========================================================
-TEMPLATE = {
-    "client": "",
-    "project": "",
-    "tester": "",
-    "contact": "",
-    "date": "",
-    "version": "1.0",
     
-    "theme_hex": "#ED863D",
-    "watermark_enabled": False,
-    "logo_b64": "",
+    def _merge_with_template(data):
+        fixed = TEMPLATE.copy()
+        for k, v in data.items():
+            fixed[k] = v
+        return fixed
     
-    # Executive + Assessment
-    "executive_summary": "",
-    "assessment_overview": "",
-    "assessment_details": "",
-    "scope": "",
-    "scope_exclusions": "",
-    "client_allowances": "",
     
-    # Findings
-    "findings": [],
+    # ===========================================================
+    # JSON IMPORT (FULL MODE)
+    # ===========================================================
     
-    # Additional Reports
-    "additional_reports": [],
+    st.subheader("📂 Import JSON Report")
     
-    # Walkthrough
-    "detailed_walkthrough": [],
+    uploaded_json = st.file_uploader(
+        "Choose JSON file",
+        type=["json"],
+        key="json_importer"
+    )
     
-    # Remediation Summary
-    "remediation_short": [],
-    "remediation_medium": [],
-    "remediation_long": [],
+    if uploaded_json:
+        try:
+            raw = uploaded_json.read().decode("utf-8")
     
-    # Vulnerability Summary cache
-    "vuln_summary_counts": {},
-    "vuln_summary_total": 0,
-    "vuln_by_host": {},
-}
-
-def _merge_with_template(data):
-    fixed = TEMPLATE.copy()
-    for k, v in data.items():
-        fixed[k] = v
-    return fixed
-
-
-# ===========================================================
-# JSON IMPORT (FULL MODE)
-# ===========================================================
-
-st.subheader("📂 Import JSON Report")
-
-uploaded_json = st.file_uploader(
-    "Choose JSON file",
-    type=["json"],
-    key="json_importer"
-)
-
-if uploaded_json:
-    try:
-        raw = uploaded_json.read().decode("utf-8")
-
-        # 1. Load JSON first
-        data = json.loads(raw)
-
-        # 2. Auto-repair encoding issues
-        data = _repair_structure(data)
-
-        # 3. Auto-fill missing keys
-        data = _merge_with_template(data)
-
-        # 4. Apply straight into session_state
-        st.session_state["report_data"] = data
-
-        st.success("✅ JSON imported successfully. Reloading interface...")
-        st.rerun()
-
-    except Exception as e:
-        st.error(f"❌ JSON Import Error: {e}")
+            # 1. Load JSON first
+            data = json.loads(raw)
+    
+            # 2. Auto-repair encoding issues
+            data = _repair_structure(data)
+    
+            # 3. Auto-fill missing keys
+            data = _merge_with_template(data)
+    
+            # 4. Apply straight into session_state
+            st.session_state["report_data"] = data
+    
+            st.success("✅ JSON imported successfully. Reloading interface...")
+            st.rerun()
+    
+        except Exception as e:
+            st.error(f"❌ JSON Import Error: {e}")
 
 
     # -----------------------------------------------------------
