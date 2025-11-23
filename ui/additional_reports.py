@@ -1,4 +1,5 @@
 # ui/additional_reports.py
+# ui/additional_reports.py
 
 import base64
 import streamlit as st
@@ -46,8 +47,8 @@ def render_additional_reports(report_data: dict):
             }
             if imgs:
                 for img in imgs:
-                    b64 = base64.b64encode(img.read()).decode()
-                    b64 = resize_image_b64(b64)
+                    raw = img.read()
+                    b64 = resize_image_b64(raw)
                     entry["images"].append(b64)
             items.append(entry)
             st.success("Additional report added.")
@@ -67,6 +68,7 @@ def render_additional_reports(report_data: dict):
     for idx, item in enumerate(items):
         with st.expander(f"{idx+1}. {item.get('name','Untitled')}"):
             st.markdown(f"#### {item.get('name','')}")
+
             if item.get("description"):
                 st.markdown("**Description**")
                 st.write(item["description"])
@@ -88,38 +90,78 @@ def render_additional_reports(report_data: dict):
                 if st.button("✏️ Edit", key=f"edit_add_{idx}"):
                     st.session_state["edit_additional_idx"] = idx
                     st.rerun()
+
             with col2:
                 if st.button("🗑️ Delete", key=f"del_add_{idx}"):
                     items.pop(idx)
                     st.success("Additional report removed.")
                     st.rerun()
 
-            # EDIT AREA
+            # ======================================================
+            # EDIT MODE
+            # ======================================================
             if st.session_state.get("edit_additional_idx") == idx:
                 st.markdown("---")
                 st.markdown("### ✏️ Edit Additional Report")
+
                 with st.form(f"edit_additional_form_{idx}", clear_on_submit=False):
-                    new_name = st.text_input("Title / Name", item.get("name",""))
-                    new_desc = st.text_area("Description", item.get("description",""), height=120)
-                    new_code = st.text_area("Code / Output", item.get("code",""), height=120)
+
+                    new_name = st.text_input("Title / Name", item.get("name",""), key=f"edit_name_{idx}")
+                    new_desc = st.text_area("Description", item.get("description",""), height=120, key=f"edit_desc_{idx}")
+                    new_code = st.text_area("Code / Output", item.get("code",""), height=120, key=f"edit_code_{idx}")
+
+                    # ------------------------------
+                    # EXISTING IMAGES + DELETE BUTTON
+                    # ------------------------------
+                    st.markdown("### Existing Images")
+
+                    if item.get("images"):
+                        for img_idx, b64 in enumerate(item["images"]):
+
+                            try:
+                                st.image(base64.b64decode(b64), use_container_width=True)
+                            except:
+                                pass
+
+                            if st.form_submit_button(f"🗑 Delete Image {img_idx+1}", key=f"del_existing_img_{idx}_{img_idx}"):
+                                del item["images"][img_idx]
+                                st.success("Image deleted.")
+                                st.session_state["edit_additional_idx"] = idx
+                                st.rerun()
+
+                    # ------------------------------
+                    # ADD NEW IMAGES
+                    # ------------------------------
+                    st.markdown("### Add More Images")
 
                     new_imgs = st.file_uploader(
-                        "Attach more images (optional)",
-                        type=["png","jpg","jpeg"],
+                        "Attach more images",
+                        type=["png", "jpg", "jpeg"],
                         accept_multiple_files=True,
                         key=f"edit_add_imgs_{idx}",
                     )
 
-                    save = st.form_submit_button("💾 Save Changes")
-                    if save:
-                        item["name"] = new_name
-                        item["description"] = new_desc
-                        item["code"] = new_code
-                        if new_imgs:
-                            for img in new_imgs:
-                                b64 = base64.b64encode(img.read()).decode()
-                                b64 = resize_image_b64(b64)
-                                item["images"].append(b64)
-                        st.session_state["edit_additional_idx"] = None
-                        st.success("Changes saved.")
-                        st.rerun()
+                    if new_imgs:
+                        for img in new_imgs:
+                            raw = img.read()
+                            b64 = resize_image_b64(raw)
+                            item["images"].append(b64)
+
+                    # ------------------------------
+                    # SAVE / CANCEL
+                    # ------------------------------
+                    colA, colB = st.columns(2)
+
+                    with colA:
+                        if st.form_submit_button("💾 Save Changes", key=f"save_add_{idx}"):
+                            item["name"] = new_name
+                            item["description"] = new_desc
+                            item["code"] = new_code
+                            st.session_state["edit_additional_idx"] = None
+                            st.success("Changes saved.")
+                            st.rerun()
+
+                    with colB:
+                        if st.form_submit_button("❌ Cancel", key=f"cancel_add_{idx}"):
+                            st.session_state["edit_additional_idx"] = None
+                            st.rerun()
