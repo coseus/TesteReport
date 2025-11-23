@@ -13,6 +13,7 @@ def build_section(elements, styles, report):
     elements.append(Spacer(1, 14))
 '''
 from reportlab.platypus import Paragraph, Spacer, Preformatted
+from reportlab.lib.styles import ParagraphStyle
 from util.helpers import format_multiline
 
 def build_section(elements, styles, report):
