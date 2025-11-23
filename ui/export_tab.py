@@ -60,7 +60,7 @@ def _generate_docx(report):
 # -------------------------------------------------------
 def render_export_tab(report_data: dict):
 
-    st.header("📤 Export Final Report")
+    st.header("ðŸ“¤ Export Final Report")
 
     # -----------------------------------------------------------
     # THEME COLOR
@@ -89,7 +89,7 @@ def render_export_tab(report_data: dict):
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("📄 Generate PDF Report"):
+        if st.button("ðŸ“„ Generate PDF Report"):
             with st.spinner("Generating PDF report..."):
                 try:
                     pdf_bytes = _generate_pdf(report_data)
@@ -99,7 +99,7 @@ def render_export_tab(report_data: dict):
                     st.error(f"Error generating PDF: {e}")
 
     with col2:
-        if st.button("📝 Generate DOCX Report"):
+        if st.button("ðŸ“ Generate DOCX Report"):
             with st.spinner("Generating DOCX report..."):
                 try:
                     docx_bytes = _generate_docx(report_data)
@@ -117,26 +117,26 @@ def render_export_tab(report_data: dict):
     docx_data = st.session_state.get("generated_docx")
 
     if pdf_data or docx_data:
-        st.subheader("⬇️ Download Files")
+        st.subheader("â¬‡ï¸ Download Files")
 
         fname = f"Pentest_Report_{report_data.get('client','Client')}_{datetime.now().strftime('%Y%m%d')}"
 
         if pdf_data:
             st.download_button(
-                label="📥 Download PDF",
+                label="ðŸ“¥ Download PDF",
                 data=pdf_data,
                 file_name=f"{fname}.pdf",
                 mime="application/pdf",
-                use_container_width=True
+                width="stretch"
             )
 
         if docx_data:
             st.download_button(
-                label="📥 Download DOCX",
+                label="ðŸ“¥ Download DOCX",
                 data=docx_data,
                 file_name=f"{fname}.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                use_container_width=True
+                width="stretch"
             )
     else:
         st.info("Generate a PDF or DOCX first to enable downloads.")
@@ -146,38 +146,52 @@ def render_export_tab(report_data: dict):
     # -----------------------------------------------------------
     # JSON IMPORT / EXPORT
     # -----------------------------------------------------------
-    st.subheader("💾 JSON Save / Load")
-
-    colA, colB = st.columns(2)
-
-    with colA:
-        if st.button("💾 Save Report as JSON"):
-            if save_json_file(report_data):
-                st.success("Report saved to JSON.")
-
-    with colB:
-        st.write("📥 Import JSON Report")
-        uploaded_json = st.file_uploader(
-            "Select .json file",
-            type=["json"],
-            key="json_import_uploader"
-        )
-
-        if uploaded_json:
-            try:
-                loaded = json.loads(uploaded_json.read().decode("utf-8"))
-                st.session_state["report_data"] = loaded
-                st.success("JSON imported successfully. Refreshing...")
-                st.rerun()
-            except Exception as e:
-                st.error(f"Failed to import JSON: {e}")
-
-    st.markdown("---")
+    st.subheader("?? JSON Save / Load")
+    
+    # --- Save JSON to disk ---
+    if st.button("?? Save JSON to Server"):
+        try:
+            with open(SAVE_FILE, "w", encoding="utf-8") as f:
+                json.dump(report_data, f, indent=2, ensure_ascii=False, default=str)
+            st.success("JSON saved on server.")
+        except Exception as e:
+            st.error(f"Error saving JSON: {e}")
+    
+    # --- Download JSON directly (Browser download) ---
+    json_bytes = json.dumps(report_data, indent=2, ensure_ascii=False, default=str).encode("utf-8")
+    
+    st.download_button(
+        label="?? Download JSON",
+        data=json_bytes,
+        file_name=f"Pentest_Report_{report_data.get('client','Client')}.json",
+        mime="application/json",
+        use_container_width=True
+    )
+    
+    # --- Import JSON (correct automatic method) ---
+    uploaded_json = st.file_uploader(
+        "?? Import Report from JSON",
+        type=["json"],
+        key="json_importer"
+    )
+    
+    if uploaded_json:
+        try:
+            data = json.loads(uploaded_json.read().decode("utf-8"))
+    
+            # update full report
+            st.session_state["report_data"] = data
+    
+            st.success("JSON imported successfully! Reloading report...")
+            st.rerun()
+    
+        except Exception as e:
+            st.error(f"JSON Import Error: {e}")
 
     # -----------------------------------------------------------
     # EXPORT SUMMARY
     # -----------------------------------------------------------
-    st.subheader("🧾 Export Summary")
+    st.subheader("ðŸ§¾ Export Summary")
     st.text(f"Client: {report_data.get('client','N/A')}")
     st.text(f"Project: {report_data.get('project','N/A')}")
     st.text(f"Tester: {report_data.get('tester','N/A')}")
@@ -188,4 +202,4 @@ def render_export_tab(report_data: dict):
             f"{len(report_data.get('remediation_short', [])) + len(report_data.get('remediation_medium', [])) + len(report_data.get('remediation_long', []))}")
     st.text(f"Date: {report_data.get('date','')}")
 
-    st.caption("Export includes all corporate sections: cover, TOC, sections 1–9, images, walkthrough, remediation summary.")
+    st.caption("Export includes all corporate sections: cover, TOC, sections 1â€“9, images, walkthrough, remediation summary.")
