@@ -14,7 +14,7 @@ from ui.additional_reports import render_additional_reports
 from ui.executive_summary_tab import render_executive_summary_tab
 from ui.export_tab import render_export_tab
 from ui.detailed_walkthrough_tab import render_detailed_walkthrough_tab
-
+from ui.remediation_summary_tab import render_remediation_summary_tab
 
 SAVE_FILE = "data/saved_report.json"
 
@@ -75,13 +75,14 @@ with st.sidebar:
 # ---------------------------------------------------------
 report_data = st.session_state["report_data"]
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "General Info",
     "Scope & Details",
     "Findings",
     "Additional Reports",
     "Detailed Walkthrough",
     "Executive Summary",
+    "Remediation Summary",
     "Export",
 ])
 
@@ -106,7 +107,11 @@ with tab6:
     report_data = render_executive_summary_tab(report_data)
 
 with tab7:
+    report_data = render_remediation_summary_tab(report_data)
+
+with tab8:
     report_data = render_export_tab(report_data)
 
 # Save at end
 save_report_data()
+
