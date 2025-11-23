@@ -65,22 +65,7 @@ if "report_data" not in st.session_state:
 # ---------------------------------------------------------
 # Sidebar
 with st.sidebar:
-    st.title("⚙️ Settings")
-
-    if st.button("🗑 Reset All Data", key="reset_all_btn"):
-        import os
-        # 1. Clear ALL Session State
-        st.session_state.clear()
-
-        # 2. Remove saved JSON
-        if os.path.exists("data/saved_report.json"):
-            try:
-                os.remove("data/saved_report.json")
-            except:
-                pass
-
-        # 3. Force full page reload
-        st.rerun()
+    render_global_reset_button()
 
 # ---------------------------------------------------------
 # MAIN TABS
@@ -124,6 +109,7 @@ with tab8:
 
 # Save at end
 save_report_data()
+
 
 
 
