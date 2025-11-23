@@ -86,32 +86,31 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "Export",
 ])
 
-
-
 with tab1:
-    render_general_info(report_data)
+    st.session_state["report_data"] = render_general_info(st.session_state["report_data"])
 
 with tab2:
-    render_scope_tab(report_data)
+    st.session_state["report_data"] = render_scope_tab(st.session_state["report_data"])
 
 with tab3:
-    render_findings_tab(report_data)
+    st.session_state["report_data"] = render_findings_tab(st.session_state["report_data"])
 
 with tab4:
-    render_additional_reports(report_data)
+    st.session_state["report_data"] = render_additional_reports(st.session_state["report_data"])
 
 with tab5:
-    report_data = render_detailed_walkthrough_tab(report_data)
+    st.session_state["report_data"] = render_executive_summary_tab(st.session_state["report_data"])
 
 with tab6:
-    report_data = render_executive_summary_tab(report_data)
+    st.session_state["report_data"] = render_detailed_walkthrough_tab(st.session_state["report_data"])
 
 with tab7:
-    report_data = render_remediation_summary_tab(report_data)
-
+    st.session_state["report_data"] = render_remediation_summary_tab(st.session_state["report_data"])
+    
 with tab8:
-    report_data = render_export_tab(report_data)
+    render_export_tab(st.session_state["report_data"])
 
 # Save at end
 save_report_data()
+
 
