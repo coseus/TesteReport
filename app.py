@@ -63,12 +63,34 @@ if "report_data" not in st.session_state:
 # ---------------------------------------------------------
 # SIDEBAR
 # ---------------------------------------------------------
+# Sidebar
 with st.sidebar:
-    st.title("Settings")
-    if st.button("Reset All Data"):
-        reset_all()
-    st.caption("Automatically saved to data/saved_report.json")
+    st.title("⚙️ Settings")
 
+    # ------------------------
+    # RESET ALL DATA (GLOBAL)
+    # ------------------------
+    if st.button("🗑 Reset All Data"):
+        import os
+
+        # 1. Clear session state completely
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+
+        # 2. Remove saved JSON file
+        if os.path.exists("data/saved_report.json"):
+            try:
+                os.remove("data/saved_report.json")
+            except:
+                pass
+
+        # 3. Reinitialize empty state
+        st.session_state["report_data"] = {}
+
+        st.success("All data has been reset.")
+        st.rerun()
+
+    st.caption("Data is auto-saved to `data/saved_report.json`")
 
 # ---------------------------------------------------------
 # MAIN TABS
@@ -112,6 +134,7 @@ with tab8:
 
 # Save at end
 save_report_data()
+
 
 
 
