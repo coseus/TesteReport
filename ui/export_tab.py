@@ -89,7 +89,7 @@ def render_export_tab(report_data: dict):
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("ðŸ“„ Generate PDF Report"):
+        if st.button("📤 Generate PDF Report"):
             with st.spinner("Generating PDF report..."):
                 try:
                     pdf_bytes = _generate_pdf(report_data)
@@ -99,7 +99,7 @@ def render_export_tab(report_data: dict):
                     st.error(f"Error generating PDF: {e}")
 
     with col2:
-        if st.button("ðŸ“ Generate DOCX Report"):
+        if st.button("📄 Generate DOCX Report"):
             with st.spinner("Generating DOCX report..."):
                 try:
                     docx_bytes = _generate_docx(report_data)
@@ -117,13 +117,13 @@ def render_export_tab(report_data: dict):
     docx_data = st.session_state.get("generated_docx")
 
     if pdf_data or docx_data:
-        st.subheader("â¬‡ï¸ Download Files")
+        st.subheader("⬇️ Download Files")
 
         fname = f"Pentest_Report_{report_data.get('client','Client')}_{datetime.now().strftime('%Y%m%d')}"
 
         if pdf_data:
             st.download_button(
-                label="ðŸ“¥ Download PDF",
+                label="⬇️ Download PDF",
                 data=pdf_data,
                 file_name=f"{fname}.pdf",
                 mime="application/pdf",
