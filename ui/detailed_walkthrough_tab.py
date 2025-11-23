@@ -6,7 +6,7 @@ from util.helpers import resize_image_b64
 
 def render_detailed_walkthrough_tab(report_data: dict):
 
-    st.header("🔍 8.0 Detailed Walkthrough")
+    st.header("ðŸ” 8.0 Detailed Walkthrough")
     st.caption("Add detailed attack chains, exploit steps, lateral movement, screenshots, code samples.")
 
     # Ensure structure
@@ -18,7 +18,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
     # ======================================================
     # ADD NEW STEP
     # ======================================================
-    with st.expander("➕ Add Walkthrough Step", expanded=False):
+    with st.expander("âž• Add Walkthrough Step", expanded=False):
 
         title = st.text_input("Title", key="dw_new_title")
         description = st.text_area("Description (multiline)", key="dw_new_desc")
@@ -54,7 +54,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
     # ======================================================
     # LIST EXISTING STEPS
     # ======================================================
-    st.subheader("📄 Existing Walkthrough Steps")
+    st.subheader("ðŸ“„ Existing Walkthrough Steps")
 
     if not walkthrough:
         st.info("No steps added yet.")
@@ -64,7 +64,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
 
         box = st.container(border=True)
         with box:
-            st.markdown(f"### **8.{idx+1} – {step['name']}**")
+            st.markdown(f"### **8.{idx+1} â€“ {step['name']}**")
 
             if step.get("description"):
                 st.markdown(step["description"].replace("\n", "<br>"), unsafe_allow_html=True)
@@ -76,18 +76,18 @@ def render_detailed_walkthrough_tab(report_data: dict):
                 st.markdown("**Images:**")
                 for b64 in step["images"]:
                     try:
-                        st.image(base64.b64decode(b64), use_container_width=True)
+                        st.image(base64.b64decode(b64), width="stretch")
                     except:
                         pass
 
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("✏️ Edit", key=f"dw_edit_btn_{idx}"):
+                if st.button("âœï¸ Edit", key=f"dw_edit_btn_{idx}"):
                     st.session_state["dw_edit_index"] = idx
                     st.rerun()
 
             with col2:
-                if st.button("🗑 Delete", key=f"dw_del_btn_{idx}"):
+                if st.button("ðŸ—‘ Delete", key=f"dw_del_btn_{idx}"):
                     del walkthrough[idx]
                     st.success("Deleted.")
                     st.rerun()
@@ -109,7 +109,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
         step = walkthrough[idx]
 
         with st.container(border=True):
-            st.markdown(f"## ✏️ Edit Walkthrough Step 8.{idx+1}")
+            st.markdown(f"## âœï¸ Edit Walkthrough Step 8.{idx+1}")
 
             # Title
             step["name"] = st.text_input(
@@ -139,11 +139,11 @@ def render_detailed_walkthrough_tab(report_data: dict):
             if step.get("images"):
                 for i, b64 in enumerate(step["images"]):
                     try:
-                        st.image(base64.b64decode(b64), use_container_width=True)
+                        st.image(base64.b64decode(b64), width="stretch")
                     except:
                         pass
 
-                    if st.button(f"🗑 Delete Image {i+1}", key=f"dw_del_img_{idx}_{i}"):
+                    if st.button(f"ðŸ—‘ Delete Image {i+1}", key=f"dw_del_img_{idx}_{i}"):
                         del step["images"][i]
                         st.rerun()
 
@@ -166,13 +166,13 @@ def render_detailed_walkthrough_tab(report_data: dict):
 
             colA, colB = st.columns(2)
             with colA:
-                if st.button("💾 Save Changes", key=f"dw_save_{idx}"):
+                if st.button("ðŸ’¾ Save Changes", key=f"dw_save_{idx}"):
                     st.session_state["dw_edit_index"] = None
                     st.success("Updated.")
                     st.rerun()
 
             with colB:
-                if st.button("❌ Cancel", key=f"dw_cancel_{idx}"):
+                if st.button("âŒ Cancel", key=f"dw_cancel_{idx}"):
                     st.session_state["dw_edit_index"] = None
                     st.rerun()
 
