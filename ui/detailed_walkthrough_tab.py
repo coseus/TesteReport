@@ -6,7 +6,7 @@ from util.helpers import resize_image_b64
 
 def render_detailed_walkthrough_tab(report_data: dict):
 
-    st.header("ðŸ” 8.0 Detailed Walkthrough")
+    st.header("🔍 Detailed Walkthrough")
     st.caption("Add detailed attack chains, exploit steps, lateral movement, screenshots, code samples.")
 
     # Ensure structure
@@ -18,7 +18,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
     # ======================================================
     # ADD NEW STEP
     # ======================================================
-    with st.expander("âž• Add Walkthrough Step", expanded=False):
+    with st.expander("➕ Add Walkthrough Step", expanded=False):
 
         title = st.text_input("Title", key="dw_new_title")
         description = st.text_area("Description (multiline)", key="dw_new_desc")
@@ -54,7 +54,7 @@ def render_detailed_walkthrough_tab(report_data: dict):
     # ======================================================
     # LIST EXISTING STEPS
     # ======================================================
-    st.subheader("ðŸ“„ Existing Walkthrough Steps")
+    st.subheader("📄 Existing Walkthrough Steps")
 
     if not walkthrough:
         st.info("No steps added yet.")
