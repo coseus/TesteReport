@@ -36,7 +36,7 @@ def render_executive_summary_tab(report_data):
             hole=0.4
         )
         fig.update_layout(title="Vulnerability Severity Distribution")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     default_summary = (
         f"During the penetration test of {report_data.get('project','the target')}, "
