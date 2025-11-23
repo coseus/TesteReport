@@ -671,13 +671,11 @@ def generate_pdf_bytes(report: dict) -> bytes:
     toc_entries.append(("6.0", "Technical Findings"))
 
     # Preluăm findings 6.x.x
-    for f in report.get("findings", []):
-        fid = f.get("id")
-        if not fid:
-            continue
-        severity = f.get("severity", "Informational")
-        title = _truncate_title(f.get("title", "Untitled Finding"))
-        toc_entries.append((f"6.{fid}", f"{severity} – {title}"))
+    for idx, f in enumerate(findings_sorted := sorted(report.get("findings", []), key=lambda x: SEVERITIES_ORDER.index(x.get("severity","Informational"))), start=1):
+        title = _truncate_title(f.get("title","Untitled Finding"))
+        sev = f.get("severity","Informational")
+        toc_entries.append((f"6.{idx}", f"{sev} – {title}"))
+
 
     # ---------- 7.x Remediation Summary ----------
     toc_entries.append(("7.0", "Remediation Summary"))
