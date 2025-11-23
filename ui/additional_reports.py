@@ -1,5 +1,4 @@
 # ui/additional_reports.py
-# ui/additional_reports.py
 
 import base64
 import streamlit as st
@@ -18,12 +17,12 @@ def render_additional_reports(report_data: dict):
     if "edit_additional_idx" not in st.session_state:
         st.session_state["edit_additional_idx"] = None
 
-    st.subheader("📄 Additional Reports & Scans")
+    st.subheader("ðŸ“„ Additional Reports & Scans")
 
     # -------------------------------------------------------
     # ADD NEW
     # -------------------------------------------------------
-    st.markdown("### ➕ Add Additional Report / Scan")
+    st.markdown("### âž• Add Additional Report / Scan")
 
     with st.form("add_additional_report_form"):
         name = st.text_input("Title / Name")
@@ -59,7 +58,7 @@ def render_additional_reports(report_data: dict):
     # -------------------------------------------------------
     # LIST EXISTING
     # -------------------------------------------------------
-    st.markdown("### 📑 Existing Additional Reports")
+    st.markdown("### ðŸ“‘ Existing Additional Reports")
 
     if not items:
         st.info("No additional reports added.")
@@ -81,18 +80,18 @@ def render_additional_reports(report_data: dict):
                 st.markdown("**Images**")
                 for b64 in item["images"]:
                     try:
-                        st.image(base64.b64decode(b64), use_container_width=True)
+                        st.image(base64.b64decode(b64), width="stretch")
                     except Exception:
                         continue
 
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("✏️ Edit", key=f"edit_add_{idx}"):
+                if st.button("âœï¸ Edit", key=f"edit_add_{idx}"):
                     st.session_state["edit_additional_idx"] = idx
                     st.rerun()
 
             with col2:
-                if st.button("🗑️ Delete", key=f"del_add_{idx}"):
+                if st.button("ðŸ—‘ï¸ Delete", key=f"del_add_{idx}"):
                     items.pop(idx)
                     st.success("Additional report removed.")
                     st.rerun()
@@ -102,7 +101,7 @@ def render_additional_reports(report_data: dict):
             # ======================================================
             if st.session_state.get("edit_additional_idx") == idx:
                 st.markdown("---")
-                st.markdown("### ✏️ Edit Additional Report")
+                st.markdown("### âœï¸ Edit Additional Report")
 
                 with st.form(f"edit_additional_form_{idx}", clear_on_submit=False):
 
@@ -119,11 +118,11 @@ def render_additional_reports(report_data: dict):
                         for img_idx, b64 in enumerate(item["images"]):
 
                             try:
-                                st.image(base64.b64decode(b64), use_container_width=True)
+                                st.image(base64.b64decode(b64), width="stretch")
                             except:
                                 pass
 
-                            if st.form_submit_button(f"🗑 Delete Image {img_idx+1}", key=f"del_existing_img_{idx}_{img_idx}"):
+                            if st.form_submit_button(f"ðŸ—‘ Delete Image {img_idx+1}", key=f"del_existing_img_{idx}_{img_idx}"):
                                 del item["images"][img_idx]
                                 st.success("Image deleted.")
                                 st.session_state["edit_additional_idx"] = idx
@@ -153,7 +152,7 @@ def render_additional_reports(report_data: dict):
                     colA, colB = st.columns(2)
 
                     with colA:
-                        if st.form_submit_button("💾 Save Changes", key=f"save_add_{idx}"):
+                        if st.form_submit_button("ðŸ’¾ Save Changes", key=f"save_add_{idx}"):
                             item["name"] = new_name
                             item["description"] = new_desc
                             item["code"] = new_code
@@ -162,6 +161,6 @@ def render_additional_reports(report_data: dict):
                             st.rerun()
 
                     with colB:
-                        if st.form_submit_button("❌ Cancel", key=f"cancel_add_{idx}"):
+                        if st.form_submit_button("âŒ Cancel", key=f"cancel_add_{idx}"):
                             st.session_state["edit_additional_idx"] = None
                             st.rerun()
