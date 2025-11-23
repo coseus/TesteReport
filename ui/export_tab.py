@@ -2,17 +2,15 @@
 """
 Export tab for Pentest Report - Ultra Corporate Edition
 Fully compatible with:
-- pdf_generator Ultra Corporate v3
+- Advanced Corporate pdf_generator
 - theme_hex color selector
 - watermark toggle
-- save/load JSON
+- save/load JSON fully
 """
 
 import streamlit as st
 from datetime import datetime
 import json
-import base64
-from io import BytesIO
 
 from report import pdf_generator
 from report import docx_generator
@@ -21,6 +19,9 @@ from report import docx_generator
 SAVE_FILE = "data/saved_report.json"
 
 
+# -------------------------------------------------------
+# JSON SAVE
+# -------------------------------------------------------
 def save_json_file(report):
     try:
         with open(SAVE_FILE, "w", encoding="utf-8") as f:
@@ -31,7 +32,10 @@ def save_json_file(report):
         return False
 
 
-def load_json_file():
+# -------------------------------------------------------
+# JSON LOAD
+# -------------------------------------------------------
+def _load_json_from_disk():
     try:
         with open(SAVE_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -40,12 +44,10 @@ def load_json_file():
         return None
 
 
+# -------------------------------------------------------
+# PDF / DOCX WRAPPERS
+# -------------------------------------------------------
 def _generate_pdf(report):
-    """
-    PDF Generator wrapper.
-    DO NOT send theme or watermark as parameters.
-    pdf_generator uses them directly from report dict.
-    """
     return pdf_generator.generate_pdf_bytes(report)
 
 
@@ -53,6 +55,9 @@ def _generate_docx(report):
     return docx_generator.generate_docx_bytes(report)
 
 
+# -------------------------------------------------------
+# MAIN EXPORT TAB
+# -------------------------------------------------------
 def render_export_tab(report_data: dict):
 
     st.header("📤 Export Final Report")
@@ -68,15 +73,18 @@ def render_export_tab(report_data: dict):
     report_data["theme_hex"] = theme
 
     # -----------------------------------------------------------
-    # WATERMARK OPTION
+    # WATERMARK
     # -----------------------------------------------------------
-    watermark = st.checkbox("Add watermark (CONFIDENTIAL)", value=report_data.get("watermark_enabled", False))
+    watermark = st.checkbox(
+        "Add watermark (CONFIDENTIAL)",
+        value=report_data.get("watermark_enabled", False)
+    )
     report_data["watermark_enabled"] = watermark
 
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # BUTTONS (PDF / DOCX)
+    # GENERATE PDF / DOCX
     # -----------------------------------------------------------
     col1, col2 = st.columns(2)
 
@@ -103,7 +111,7 @@ def render_export_tab(report_data: dict):
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # DOWNLOAD GENERATED FILES
+    # DOWNLOADS
     # -----------------------------------------------------------
     pdf_data = st.session_state.get("generated_pdf")
     docx_data = st.session_state.get("generated_docx")
@@ -136,7 +144,7 @@ def render_export_tab(report_data: dict):
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # SAVE / LOAD JSON
+    # JSON IMPORT / EXPORT
     # -----------------------------------------------------------
     st.subheader("💾 JSON Save / Load")
 
@@ -148,12 +156,21 @@ def render_export_tab(report_data: dict):
                 st.success("Report saved to JSON.")
 
     with colB:
-        if st.button("📂 Load JSON"):
-            loaded = load_json_file()
-            if loaded:
+        st.write("📥 Import JSON Report")
+        uploaded_json = st.file_uploader(
+            "Select .json file",
+            type=["json"],
+            key="json_import_uploader"
+        )
+
+        if uploaded_json:
+            try:
+                loaded = json.loads(uploaded_json.read().decode("utf-8"))
                 st.session_state["report_data"] = loaded
-                st.success("JSON loaded. Refreshing...")
+                st.success("JSON imported successfully. Refreshing...")
                 st.rerun()
+            except Exception as e:
+                st.error(f"Failed to import JSON: {e}")
 
     st.markdown("---")
 
@@ -161,12 +178,14 @@ def render_export_tab(report_data: dict):
     # EXPORT SUMMARY
     # -----------------------------------------------------------
     st.subheader("🧾 Export Summary")
-
     st.text(f"Client: {report_data.get('client','N/A')}")
     st.text(f"Project: {report_data.get('project','N/A')}")
     st.text(f"Tester: {report_data.get('tester','N/A')}")
     st.text(f"Findings: {len(report_data.get('findings', []))}")
     st.text(f"Additional Reports: {len(report_data.get('additional_reports', []))}")
+    st.text(f"Detailed Walkthrough: {len(report_data.get('detailed_walkthrough', []))}")
+    st.text(f"Remediation Items: "
+            f"{len(report_data.get('remediation_short', [])) + len(report_data.get('remediation_medium', [])) + len(report_data.get('remediation_long', []))}")
     st.text(f"Date: {report_data.get('date','')}")
 
-    st.caption("Export includes full corporate layout, TOC with findings and additional reports, heatmap, images, and badges.")
+    st.caption("Export includes all corporate sections: cover, TOC, sections 1–9, images, walkthrough, remediation summary.")
