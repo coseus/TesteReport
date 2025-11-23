@@ -7,6 +7,7 @@ from datetime import datetime
 
 import setup_paths
 
+from ui.reset import render_global_reset_button
 from ui.general_info import render_general_info
 from ui.scope_tab import render_scope_tab
 from ui.findings_tab import render_findings_tab
@@ -109,6 +110,7 @@ with tab8:
 
 # Save at end
 save_report_data()
+
 
 
 
