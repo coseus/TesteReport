@@ -312,7 +312,7 @@ def _build_technical_findings(elements, styles, report):
     elements.append(Paragraph("6.0 Technical Findings", styles["HeadingModern"]))
     elements.append(Spacer(1, 6))
 
-    # sortare după severitate ordonată
+    # sortare după severitate ordonată (CORRECT)
     def sev_key(f):
         try:
             return SEVERITIES_ORDER.index(f.get("severity", "Informational"))
@@ -320,15 +320,14 @@ def _build_technical_findings(elements, styles, report):
             return len(SEVERITIES_ORDER)
 
     findings_sorted = sorted(findings, key=sev_key)
-    
-    # Numerotare
+
+    # ----- RENUNMEROTARE STRICTĂ: 6.1, 6.2, 6.3 -----
     for idx, f in enumerate(findings_sorted, start=1):
-        fid = f.get("id") or "-"
         sev = f.get("severity", "Informational")
         title = f.get("title", "Untitled Finding")
 
         elements.append(
-            Paragraph(f"6.{fid} [{sev}] {title}", styles["SubHeading"])
+            Paragraph(f"6.{idx} [{sev}] {title}", styles["SubHeading"])
         )
 
         # meta info
@@ -348,46 +347,49 @@ def _build_technical_findings(elements, styles, report):
             meta_lines.append(f"CVE: {cve}")
 
         if meta_lines:
-            elements.append(
-                Paragraph(" | ".join(meta_lines), styles["MetaSmall"])
-            )
+            elements.append(Paragraph(" | ".join(meta_lines), styles["MetaSmall"]))
             elements.append(Spacer(1, 4))
 
+        # description
         if f.get("description"):
             elements.append(Paragraph("<b>Description</b>", styles["NormalHelv"]))
             elements.append(
-                Paragraph(f.get("description", "").replace("\n", "<br/>"), styles["NormalHelv"])
+                Paragraph(f["description"].replace("\n", "<br/>"), styles["NormalHelv"])
             )
             elements.append(Spacer(1, 4))
 
+        # impact
         if f.get("impact"):
             elements.append(Paragraph("<b>Impact</b>", styles["NormalHelv"]))
             elements.append(
-                Paragraph(f.get("impact", "").replace("\n", "<br/>"), styles["NormalHelv"])
+                Paragraph(f["impact"].replace("\n", "<br/>"), styles["NormalHelv"])
             )
             elements.append(Spacer(1, 4))
 
+        # recommendation
         if f.get("recommendation"):
             elements.append(Paragraph("<b>Recommendation</b>", styles["NormalHelv"]))
             elements.append(
-                Paragraph(f.get("recommendation", "").replace("\n", "<br/>"), styles["NormalHelv"])
+                Paragraph(f["recommendation"].replace("\n", "<br/>"), styles["NormalHelv"])
             )
             elements.append(Spacer(1, 4))
 
+        # code
         if f.get("code"):
-            elements.append(Paragraph("<b>Code / Output</b>", styles["NormalHelv"]))
             safe_code = (
-                f.get("code", "")
+                f["code"]
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
                 .replace("\n", "<br/>")
             )
+            elements.append(Paragraph("<b>Code / Output</b>", styles["NormalHelv"]))
             elements.append(
                 Paragraph(f"<font face='Courier'>{safe_code}</font>", styles["NormalHelv"])
             )
             elements.append(Spacer(1, 4))
 
+        # images
         img_objs = _pdf_safe_images(f.get("images", []), max_w_mm=140)
         if img_objs:
             elements.append(Paragraph("<b>Evidence Images</b>", styles["NormalHelv"]))
@@ -397,7 +399,6 @@ def _build_technical_findings(elements, styles, report):
                 elements.append(Spacer(1, 6))
 
         elements.append(Spacer(1, 12))
-
 
 # ---------- Additional Reports (9.0 / 9.x) ----------
 def _build_additional_reports(elements, styles, report):
