@@ -336,8 +336,9 @@ def _build_technical_findings(elements, styles, report):
             return len(SEVERITIES_ORDER)
 
     findings_sorted = sorted(findings, key=sev_key)
-
-    for f in findings_sorted:
+    
+    # Numerotare
+    for idx, f in enumerate(findings_sorted, start=1):
         fid = f.get("id") or "-"
         sev = f.get("severity", "Informational")
         title = f.get("title", "Untitled Finding")
